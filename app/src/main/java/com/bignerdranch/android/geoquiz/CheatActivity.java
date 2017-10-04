@@ -17,10 +17,12 @@ import android.widget.TextView;
 public class CheatActivity extends Activity {
 
     private static final String TAG = "CheatActivity";
+    private static final String ANSWER_SHOWN_KEY = "answerShown";
     public static final String EXTRA_ANSWER_IS_TRUE = "com.bignerdranch.android.geoquiz.answer_is_true";
     public static final String EXTRA_ANSWER_SHOWN = "com.bignerdranch.android.geoquiz.answer_shown";
 
     private boolean mAnswerIsTrue;
+    private boolean mAnswerIsShown;
     private TextView mAnswerTextView;
     private Button mShowAnswerButton;
 
@@ -42,18 +44,28 @@ public class CheatActivity extends Activity {
 
         mShowAnswerButton = findViewById(R.id.showAnswerButton);
 
-        setAnswerShownResults(false);
-
         mShowAnswerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mAnswerTextView.setText(mAnswerIsTrue ? R.string.true_button : R.string.false_button);
+                mAnswerIsShown = true;
                 setAnswerShownResults(true);
             }
         });
+
+        if (savedInstance != null) {
+            mAnswerIsShown = savedInstance.getBoolean(ANSWER_SHOWN_KEY, false);
+            setAnswerShownResults(mAnswerIsShown);
+        }
     }
 
-    
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        Log.i(TAG, "onSaveInstanceState");
+
+        savedInstanceState.putBoolean(ANSWER_SHOWN_KEY, mAnswerIsShown);
+    }
 
     @Override
     public void onStart() {

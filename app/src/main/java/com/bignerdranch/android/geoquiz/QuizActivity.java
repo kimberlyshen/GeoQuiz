@@ -21,6 +21,7 @@ public class QuizActivity extends AppCompatActivity {
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
     private static final String CHEAT_KEY = "cheated";
+    private static final String CHEAT_ARRAY_KEY = "cheatArray";
 
     private TrueFalse[] mQuestionBank = new TrueFalse[] {
             new TrueFalse(R.string.question_oceans, true),
@@ -32,6 +33,7 @@ public class QuizActivity extends AppCompatActivity {
 
     private int mCurrentIndex = 0;
     private boolean mIsCheater;
+    private boolean[] mCheatArray = new boolean[mQuestionBank.length];
 
     private void updateQuestion() {
         int question = mQuestionBank[mCurrentIndex].getQuestion();
@@ -40,9 +42,9 @@ public class QuizActivity extends AppCompatActivity {
 
     private void checkAnswer(boolean userPressedTrue) {
         boolean answerIsTrue = mQuestionBank[mCurrentIndex].isTrueQuestion();
-        int messageResId = 0;
+        int messageResId;
 
-        if (mIsCheater) {
+        if (mIsCheater || mCheatArray[mCurrentIndex]) {
             messageResId = R.string.judgement_toast;
         } else {
             messageResId = userPressedTrue == answerIsTrue ? R.string.correct_toast : R.string.incorrect_toast;
@@ -57,6 +59,7 @@ public class QuizActivity extends AppCompatActivity {
             return;
         }
         mIsCheater = data.getBooleanExtra(CheatActivity.EXTRA_ANSWER_SHOWN, false);
+        mCheatArray[mCurrentIndex] = mIsCheater;
     }
 
     @Override
@@ -123,6 +126,7 @@ public class QuizActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
             mIsCheater = savedInstanceState.getBoolean(CHEAT_KEY, false);
+            mCheatArray = savedInstanceState.getBooleanArray(CHEAT_ARRAY_KEY);
         }
 
         updateQuestion();
@@ -134,6 +138,7 @@ public class QuizActivity extends AppCompatActivity {
         Log.i(TAG, "onSaveInstanceState");
         savedInstanceState.putInt(KEY_INDEX, mCurrentIndex);
         savedInstanceState.putBoolean(CHEAT_KEY, mIsCheater);
+        savedInstanceState.putBooleanArray(CHEAT_ARRAY_KEY, mCheatArray);
     }
 
     @Override
