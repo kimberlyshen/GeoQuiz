@@ -22,12 +22,12 @@
         android:id="@+id/showAnswerButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/show_answer_button"/>
+        android:text="@string/show_answer_button" />
 
     <TextView
         android:id="@+id/osVersion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="16dp"/>
+        android:padding="24dp"/>
 
 </LinearLayout>
