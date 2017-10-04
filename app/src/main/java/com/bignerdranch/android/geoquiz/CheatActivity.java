@@ -2,6 +2,8 @@ package com.bignerdranch.android.geoquiz;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
+import android.os.Build.VERSION;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -25,7 +27,7 @@ public class CheatActivity extends Activity {
     private boolean mAnswerIsShown;
     private TextView mAnswerTextView;
     private Button mShowAnswerButton;
-
+    private TextView mOSVersion;
 
     private void setAnswerShownResults(boolean isAnswerShown) {
         Intent data = new Intent();
@@ -57,6 +59,10 @@ public class CheatActivity extends Activity {
             mAnswerIsShown = savedInstance.getBoolean(ANSWER_SHOWN_KEY, false);
             setAnswerShownResults(mAnswerIsShown);
         }
+
+        String osString = "API level " + VERSION.SDK_INT;
+        mOSVersion = findViewById(R.id.osVersion);
+        mOSVersion.setText(osString);
     }
 
     @Override
