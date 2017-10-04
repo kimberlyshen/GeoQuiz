@@ -3,7 +3,6 @@ package com.bignerdranch.android.geoquiz;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.system.ErrnoException;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -21,6 +20,7 @@ public class QuizActivity extends AppCompatActivity {
     private TextView mQuestionTextView;
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
+    private static final String CHEAT_KEY = "cheated";
 
     private TrueFalse[] mQuestionBank = new TrueFalse[] {
             new TrueFalse(R.string.question_oceans, true),
@@ -31,6 +31,7 @@ public class QuizActivity extends AppCompatActivity {
     };
 
     private int mCurrentIndex = 0;
+    private boolean mIsCheater;
 
     private void updateQuestion() {
         int question = mQuestionBank[mCurrentIndex].getQuestion();
@@ -39,9 +40,23 @@ public class QuizActivity extends AppCompatActivity {
 
     private void checkAnswer(boolean userPressedTrue) {
         boolean answerIsTrue = mQuestionBank[mCurrentIndex].isTrueQuestion();
-        int messageResId = userPressedTrue == answerIsTrue ? R.string.correct_toast : R.string.incorrect_toast;
+        int messageResId = 0;
+
+        if (mIsCheater) {
+            messageResId = R.string.judgement_toast;
+        } else {
+            messageResId = userPressedTrue == answerIsTrue ? R.string.correct_toast : R.string.incorrect_toast;
+        }
 
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (data == null) {
+            return;
+        }
+        mIsCheater = data.getBooleanExtra(CheatActivity.EXTRA_ANSWER_SHOWN, false);
     }
 
     @Override
@@ -79,6 +94,7 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.length;
+                mIsCheater = false;
                 updateQuestion();
             }
         });
@@ -88,6 +104,7 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 mCurrentIndex = (mCurrentIndex + mQuestionBank.length - 1) % mQuestionBank.length;
+                mIsCheater = false;
                 updateQuestion();
             }
         });
@@ -97,12 +114,15 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(QuizActivity.this, CheatActivity.class);
-                startActivity(intent);
+                boolean answerIsTrue = mQuestionBank[mCurrentIndex].isTrueQuestion();
+                intent.putExtra(CheatActivity.EXTRA_ANSWER_IS_TRUE, answerIsTrue);
+                startActivityForResult(intent, 0);
             }
         });
 
         if (savedInstanceState != null) {
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
+            mIsCheater = savedInstanceState.getBoolean(CHEAT_KEY, false);
         }
 
         updateQuestion();
@@ -113,6 +133,7 @@ public class QuizActivity extends AppCompatActivity {
         super.onSaveInstanceState(savedInstanceState);
         Log.i(TAG, "onSaveInstanceState");
         savedInstanceState.putInt(KEY_INDEX, mCurrentIndex);
+        savedInstanceState.putBoolean(CHEAT_KEY, mIsCheater);
     }
 
     @Override

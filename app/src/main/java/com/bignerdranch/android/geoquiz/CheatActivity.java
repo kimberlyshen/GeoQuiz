@@ -1,8 +1,13 @@
 package com.bignerdranch.android.geoquiz;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+
 
 /**
  * @author kshen
@@ -12,13 +17,43 @@ import android.util.Log;
 public class CheatActivity extends Activity {
 
     private static final String TAG = "CheatActivity";
+    public static final String EXTRA_ANSWER_IS_TRUE = "com.bignerdranch.android.geoquiz.answer_is_true";
+    public static final String EXTRA_ANSWER_SHOWN = "com.bignerdranch.android.geoquiz.answer_shown";
+
+    private boolean mAnswerIsTrue;
+    private TextView mAnswerTextView;
+    private Button mShowAnswerButton;
+
+
+    private void setAnswerShownResults(boolean isAnswerShown) {
+        Intent data = new Intent();
+        data.putExtra(EXTRA_ANSWER_SHOWN, isAnswerShown);
+        setResult(RESULT_OK, data);
+    }
 
     @Override
     public void onCreate(Bundle savedInstance) {
         super.onCreate(savedInstance);
         Log.d(TAG, "onCreate(Bundle) called");
         setContentView(R.layout.activity_cheat);
+
+        mAnswerIsTrue = getIntent().getBooleanExtra(EXTRA_ANSWER_IS_TRUE, false);
+        mAnswerTextView = findViewById(R.id.answerTextView);
+
+        mShowAnswerButton = findViewById(R.id.showAnswerButton);
+
+        setAnswerShownResults(false);
+
+        mShowAnswerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mAnswerTextView.setText(mAnswerIsTrue ? R.string.true_button : R.string.false_button);
+                setAnswerShownResults(true);
+            }
+        });
     }
+
+    
 
     @Override
     public void onStart() {
